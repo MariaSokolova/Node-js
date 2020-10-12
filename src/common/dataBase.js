@@ -79,7 +79,8 @@ const deleteBoard = async id => {
   if (!board) {
     return;
   }
-  DB.board = DB.boards.filter(el => el.id !== id);
+  DB.boards = DB.boards.filter(el => el.id !== id);
+  DB.tasks = DB.tasks.filter(task => task.boardId !== id);
   return board;
 };
 
