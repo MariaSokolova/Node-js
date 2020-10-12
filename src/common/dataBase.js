@@ -70,11 +70,46 @@ const updateBoard = async (board, id) => {
 
 const deleteBoard = async id => {
   const board = getBoardById(id);
-  console.log('id from DB', id);
   if (!board) {
     return;
   }
   DB.board = DB.boards.filter(el => el.id !== id);
+  return board;
+};
+
+// Tasks
+
+const getAllTasks = async id => DB.tasks.filter(b => b.boardId === id);
+
+const createTask = async task => {
+  DB.tasks.push(task);
+  return task;
+};
+
+const getTaskById = async (boardId, id) => {
+  const tasksByBoard = DB.tasks.filter(el => el.boardId === boardId);
+  return tasksByBoard.filter(el => el.id === id)[0];
+};
+
+const updateTask = async (task, boardId, id) => {
+  const idx = DB.tasks.findIndex(t => t.id === id);
+  if (idx === -1) {
+    return;
+  }
+  const updatedTask = {
+    ...DB.tasks[idx],
+    ...task
+  };
+  DB.tasks[idx] = updatedTask;
+  return updatedTask;
+};
+
+const deleteTask = async (boardId, id) => {
+  const board = getTaskById(boardId, id);
+  if (!board) {
+    return;
+  }
+  DB.tasks = DB.tasks.filter(el => el.id !== id);
   return board;
 };
 
@@ -88,5 +123,10 @@ module.exports = {
   getBoardById,
   createBoard,
   updateBoard,
-  deleteBoard
+  deleteBoard,
+  getAllTasks,
+  createTask,
+  getTaskById,
+  updateTask,
+  deleteTask
 };
