@@ -25,6 +25,10 @@ app.use('/users', userRouter);
 app.use('/boards', boardRouter);
 boardRouter.use('/:boardId/tasks', taskRouter);
 
+app.use('*', (req, res) => {
+  res.status(404).send('This path is wrong!');
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(404).send('Something broke!');

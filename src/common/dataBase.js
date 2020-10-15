@@ -39,12 +39,9 @@ const deleteUser = async id => {
     return;
   }
   DB.users = DB.users.filter(el => el.id !== id);
-  DB.tasks = DB.tasks.map(task => {
-    if (task.userId === id) {
-      task.userId = null;
-    }
-    return task;
-  });
+  DB.tasks
+    .filter(task => task.userId === id)
+    .forEach(task => (task.userId = null));
   return user;
 };
 
