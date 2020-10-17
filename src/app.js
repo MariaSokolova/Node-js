@@ -18,8 +18,16 @@ app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
 
-app.use(morgan('combined', { stream: createWriteStream('access.log') }));
-app.use(morgan('dev'));
+morgan.token('body', req => {
+  const body = { ...req.body };
+  delete body.password;
+  return JSON.stringify(body);
+});
+const morganFormat =
+  ':method :url :status :response-time ms - :res[content-length] :body - :req[content-length]';
+
+app.use(morgan(morganFormat, { stream: createWriteStream('access.log') }));
+app.use(morgan(morganFormat));
 
 app.use('/', (req, res, next) => {
   if (req.originalUrl === '/') {
