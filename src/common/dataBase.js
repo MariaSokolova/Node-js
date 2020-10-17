@@ -83,7 +83,7 @@ const deleteBoard = async id => {
 
 // Tasks
 
-const getAllTasks = async id => DB.tasks.filter(b => b.boardId === id);
+const getAllTasks = async id => DB.tasks.filter(task => task.boardId === id);
 
 const createTask = async task => {
   DB.tasks.push(task);

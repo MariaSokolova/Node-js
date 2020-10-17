@@ -1,5 +1,6 @@
 const router = require('express').Router({ mergeParams: true });
-const Task = require('./task.model');
+
+const ApiError = require('../../error/ApiError');
 const taskService = require('./task.service');
 
 router.route('/').get(async (req, res) => {
@@ -7,30 +8,30 @@ router.route('/').get(async (req, res) => {
   res.json(tasks);
 });
 
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get(async (req, res, next) => {
   try {
     const task = await taskService.getById(req.params.boardId, req.params.id);
     res.json(task);
   } catch (e) {
-    res.status(404).send(e.message);
+    return next(e);
   }
 });
 
-router.route('/').post(async (req, res) => {
-  const task = await taskService.create(
-    new Task({
-      title: req.body.title,
-      order: req.body.order,
-      description: req.body.description,
-      userId: req.body.userId,
-      boardId: req.params.boardId,
-      columnId: req.body.columnId
-    })
-  );
-  res.json(task);
+router.route('/').post(async (req, res, next) => {
+  try {
+    const { title } = req.body;
+    if (!title) {
+      next(ApiError.badRequest('Title and userId  is required'));
+      return;
+    }
+    const task = await taskService.create(req.params.boardId, req.body);
+    res.json(task);
+  } catch (e) {
+    return next(e);
+  }
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put(async (req, res, next) => {
   try {
     const task = await taskService.updateTask(
       req.body,
@@ -38,17 +39,17 @@ router.route('/:id').put(async (req, res) => {
       req.params.id
     );
     await res.json(task);
-  } catch (err) {
-    res.status(400).send(err.message);
+  } catch (e) {
+    return next(e);
   }
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/:id').delete(async (req, res, next) => {
   try {
     await taskService.deleteTask(req.params.boardId, req.params.id);
     res.status(204).send();
-  } catch (err) {
-    res.status(404).send(err.message);
+  } catch (e) {
+    return next(e);
   }
 });
 
