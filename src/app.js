@@ -10,7 +10,7 @@ const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
 const ApiError = require('./error/ApiError');
 const logger = require('./common/winston');
-const { time } = require('./common/utils');
+const { morganFormat } = require('./common/morgan');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -18,18 +18,6 @@ const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
 app.use(express.json());
 
 app.use('/doc', swaggerUI.serve, swaggerUI.setup(swaggerDocument));
-
-morgan.token('body', req => {
-  const body = { ...req.body };
-  delete body.password;
-  return JSON.stringify(body);
-});
-
-morgan.token('time', () => {
-  return time();
-});
-const morganFormat =
-  ':time method: :method, url: :url, status: :status, :response-time ms, body: :body]';
 
 app.use(morgan(morganFormat, { stream: logger.stream }));
 app.use(morgan(morganFormat));

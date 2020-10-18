@@ -33,6 +33,7 @@ const logger = new winston.createLogger({
     new winston.transports.File(options.fileError),
     new winston.transports.Console(options.console)
   ],
+  format: winston.format.combine(winston.format.prettyPrint()),
 
   exitOnError: false
 });
