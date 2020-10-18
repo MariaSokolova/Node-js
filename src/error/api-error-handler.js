@@ -1,7 +1,13 @@
 const ApiError = require('./ApiError');
+const { time } = require('../common/utils');
+const logger = require('../common/winston');
 
 function apiErrorHandler(err, req, res, next) {
-  console.error(err);
+  logger.error(
+    `${time()} - ${err.code || 500} - ${err.message} - ${req.originalUrl} - ${
+      req.method
+    }`
+  );
 
   if (err instanceof ApiError) {
     res.status(err.code).json(err.message);
