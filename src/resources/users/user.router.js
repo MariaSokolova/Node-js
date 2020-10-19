@@ -1,48 +1,52 @@
 const router = require('express').Router();
+
 const User = require('./user.model');
 const usersService = require('./user.service');
+const ApiError = require('../../error/ApiError');
 
 router.route('/').get(async (req, res) => {
   const users = await usersService.getAll();
   res.json(users.map(User.toResponse));
 });
 
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get(async (req, res, next) => {
   try {
     const user = await usersService.getById(req.params.id);
     res.json(User.toResponse(user));
   } catch (e) {
-    res.status(404).send(e.message);
+    return next(e);
   }
 });
 
-router.route('/').post(async (req, res) => {
+router.route('/').post(async (req, res, next) => {
+  const { name, login, password } = req.body;
+  if (!name || !login || !password) {
+    next(ApiError.badRequest('Name, login and password are required'));
+    return;
+  }
   const user = await usersService.create(
     new User({
-      id: req.body.id,
-      name: req.body.name,
-      login: req.body.login,
-      password: req.body.password
+      ...req.body
     })
   );
   res.json(User.toResponse(user));
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put(async (req, res, next) => {
   try {
     const user = await usersService.updateUser(req.body, req.params.id);
     res.json(User.toResponse(user));
-  } catch (err) {
-    res.status(404).send(err.message);
+  } catch (e) {
+    return next(e);
   }
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/:id').delete(async (req, res, next) => {
   try {
     await usersService.deleteUser(req.params.id);
     res.status(204).send();
-  } catch (err) {
-    res.status(404).send(err.message);
+  } catch (e) {
+    return next(e);
   }
 });
 

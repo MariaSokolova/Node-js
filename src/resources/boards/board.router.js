@@ -1,51 +1,51 @@
 const router = require('express').Router();
 const Board = require('./board.model');
+const ApiError = require('../../error/ApiError');
 const boardService = require('./board.service');
 
 router.route('/').get(async (req, res) => {
   const boards = await boardService.getAll();
-  // map user fields to exclude secret fields like "password"
   res.json(boards);
 });
 
-router.route('/:id').get(async (req, res) => {
+router.route('/:id').get(async (req, res, next) => {
   try {
     const board = await boardService.getById(req.params.id);
     res.json(board);
   } catch (e) {
-    res.status(404).send(e.message);
+    return next(e);
   }
 });
 
-router.route('/').post(async (req, res) => {
+router.route('/').post(async (req, res, next) => {
+  const { title, columns } = req.body;
+  if (!title || !columns) {
+    next(ApiError.badRequest('Title and columns are required'));
+    return;
+  }
   const board = await boardService.create(
     new Board({
-      id: req.body.id,
-      title: req.body.title,
-      columns: req.body.columns
+      ...req.body
     })
   );
   res.json(board);
 });
 
-router.route('/:id').put(async (req, res) => {
+router.route('/:id').put(async (req, res, next) => {
   try {
     const board = await boardService.updateBoard(req.body, req.params.id);
     res.json(board);
-  } catch (err) {
-    res.status(400).send(err.message);
+  } catch (e) {
+    return next(e);
   }
 });
 
-router.route('/:id').delete(async (req, res) => {
+router.route('/:id').delete(async (req, res, next) => {
   try {
-    console.log('id from router', req.params.id);
-
     await boardService.deleteBoard(req.params.id);
-
     res.status(204).send();
-  } catch (err) {
-    res.status(404).send(err.message);
+  } catch (e) {
+    return next(e);
   }
 });
 
