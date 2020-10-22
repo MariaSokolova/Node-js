@@ -11,7 +11,6 @@ const taskRouter = require('./resources/tasks/task.router');
 const ApiError = require('./error/ApiError');
 const logger = require('./common/winston');
 const { morganFormat } = require('./common/morgan');
-const { time } = require('./common/utils');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -43,22 +42,8 @@ app.all('*', (req, res, next) => {
 
 app.use(apiErrorHandler);
 
-process.on('unhandledRejection', err => {
-  logger.error(`${time()} -  ${err.message}`);
-  setTimeout(() => {
-    //   eslint-disable-next-line no-process-exit
-    process.exit(1);
-  }, 100);
-});
 // Promise.reject(Error('Oops!'));
 
-process.on('uncaughtException', err => {
-  logger.error(`${time()} -  ${err.message}`);
-  logger.on('finish', () => {
-    // eslint-disable-next-line no-process-exit
-    setImmediate(() => process.exit(1));
-  });
-});
 // throw Error('Oops!');
 
 module.exports = app;
