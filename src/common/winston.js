@@ -52,7 +52,10 @@ const logger = new winston.createLogger({
     new winston.transports.File(options.fileError),
     new winston.transports.Console(options.console)
   ],
-  exceptionHandlers: [new winston.transports.File(options.fileUnhandled)],
+  exceptionHandlers: [
+    new winston.transports.File(options.fileUnhandled),
+    new winston.transports.Console(options.console)
+  ],
   exitOnError: true
 });
 
