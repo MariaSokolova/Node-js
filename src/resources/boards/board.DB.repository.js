@@ -1,4 +1,5 @@
 const { Board } = require('./board.model');
+const { getAllTasks, deleteTask } = require('../tasks/task.DB.repository');
 const ApiError = require('../../error/ApiError');
 
 const getAll = async () => {
@@ -31,6 +32,10 @@ const deleteBoard = async id => {
   if (!board) {
     throw ApiError.notFound(`the board with id: ${id} was not found`);
   }
+  const tasks = await getAllTasks(id);
+  console.log('tasks', tasks);
+
+  tasks.forEach(task => deleteTask(id, task._id));
   await Board.deleteOne({ _id: id });
 };
 
