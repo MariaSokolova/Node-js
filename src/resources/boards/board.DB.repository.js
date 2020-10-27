@@ -18,12 +18,11 @@ const create = async board => {
 };
 
 const updateBoard = async (board, id) => {
-  let updatedBoard = await getById(id);
-  console.log('updatedBoard', updatedBoard);
+  await Board.update({ _id: id }, board);
+  const updatedBoard = await getById(id);
   if (!updatedBoard) {
     throw ApiError.notFound(`the board with id: ${id} was not found`);
   }
-  updatedBoard = await Board.updateOne(board, { _id: id });
   return updatedBoard;
 };
 

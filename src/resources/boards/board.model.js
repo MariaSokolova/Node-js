@@ -3,7 +3,15 @@ const mongoose = require('mongoose');
 const boardSchema = new mongoose.Schema(
   {
     title: String,
-    columns: [{ title: String, order: Number }]
+    columns: [
+      {
+        title: {
+          type: String,
+          trim: true
+        },
+        order: Number
+      }
+    ]
   },
   { collection: 'boards' },
   { versionKey: false }
