@@ -42,8 +42,4 @@ app.all('*', (req, res, next) => {
 
 app.use(apiErrorHandler);
 
-// Promise.reject(Error('Oops!'));
-
-// throw Error('Oops!');
-
 module.exports = app;

@@ -1,9 +1,9 @@
+const logger = require('./common/winston');
+
 const mongoose = require('mongoose');
 const { User } = require('./resources/users/user.model');
-
 const { PORT, MONGO_CONNECTION_STRING } = require('./common/config');
 const app = require('./app');
-const logger = require('./common/winston');
 
 const users = [
   new User({ name: 'user1', login: 'admin', password: 'admin' }),
