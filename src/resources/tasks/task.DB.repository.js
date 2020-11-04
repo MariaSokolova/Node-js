@@ -1,10 +1,6 @@
 const { Task } = require('./task.model');
 const ApiError = require('../../error/ApiError');
 
-const getAllTasks = async () => {
-  return await Task.find({});
-};
-
 const getTasksByBoardId = async boardId => {
   return await Task.find({ boardId });
 };
@@ -35,12 +31,18 @@ const deleteTask = async (boardId, id) => {
   await getById(boardId, id);
   await Task.deleteOne({ _id: id });
 };
+const unassignUserTasks = async userId => {
+  return await Task.updateMany({ userId }, { userId: null });
+};
+
+const removeByBoardId = async boardId => Task.deleteMany({ boardId });
 
 module.exports = {
-  getAllTasks,
   getTasksByBoardId,
   create,
   getById,
   updateTask,
-  deleteTask
+  deleteTask,
+  unassignUserTasks,
+  removeByBoardId
 };

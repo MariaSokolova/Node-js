@@ -52,7 +52,7 @@ router.route('/:id').put(async (req, res, next) => {
 router.route('/:id').delete(async (req, res, next) => {
   try {
     await taskService.deleteTask(req.params.boardId, req.params.id);
-    res.status(204).send();
+    res.sendStatus(204);
   } catch (e) {
     return next(e);
   }

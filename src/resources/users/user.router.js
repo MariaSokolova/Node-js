@@ -23,13 +23,18 @@ router.route('/:id').get(async (req, res, next) => {
 });
 
 router.route('/').post(async (req, res, next) => {
-  const { name, login, password } = req.body;
-  if (!name || !login || !password) {
-    next(ApiError.badRequest('Name, login and password are required'));
-    return;
+  try {
+    const { name, login, password } = req.body;
+    if (!name || !login || !password) {
+      next(ApiError.badRequest('Name, login and password are required'));
+      return;
+    }
+    const user = await usersService.create(req.body);
+    console.log('user form router', user);
+    res.status(200).send(toResponse(user));
+  } catch (e) {
+    return next(e);
   }
-  const user = await usersService.create(req.body);
-  res.status(200).send(toResponse(user));
 });
 
 router.route('/:id').put(async (req, res, next) => {
@@ -44,7 +49,7 @@ router.route('/:id').put(async (req, res, next) => {
 router.route('/:id').delete(async (req, res, next) => {
   try {
     await usersService.deleteUser(req.params.id);
-    res.status(204).send();
+    res.sendStatus(204);
   } catch (e) {
     return next(e);
   }
