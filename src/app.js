@@ -8,9 +8,11 @@ const apiErrorHandler = require('./error/api-error-handler');
 const userRouter = require('./resources/users/user.router');
 const boardRouter = require('./resources/boards/board.router');
 const taskRouter = require('./resources/tasks/task.router');
+const authRouter = require('./auth/auth.router');
 const ApiError = require('./error/ApiError');
 const logger = require('./common/winston');
 const { morganFormat } = require('./common/morgan');
+const auth = require('./middleware/auth');
 
 const app = express();
 const swaggerDocument = YAML.load(path.join(__dirname, '../doc/api.yaml'));
@@ -30,8 +32,9 @@ app.use('/', (req, res, next) => {
   next();
 });
 
-app.use('/users', userRouter);
-app.use('/boards', boardRouter);
+app.use('/login', authRouter);
+app.use('/users', auth, userRouter);
+app.use('/boards', auth, boardRouter);
 boardRouter.use('/:boardId/tasks', taskRouter);
 
 app.all('*', (req, res, next) => {

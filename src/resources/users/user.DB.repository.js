@@ -1,9 +1,26 @@
 const ApiError = require('../../error/ApiError');
 const { User } = require('./user.model');
+const { hashPassword } = require('../../common/utils');
 
 const getAll = async () => User.find({});
 
-const create = async user => User.create(user);
+const create = async user => {
+  const checkUser = await User.findOne({ login: user.login });
+  if (checkUser) {
+    throw ApiError.badRequest(
+      `the user with login: ${user.login} is already exists`
+    );
+  }
+  const { password } = user;
+  const hashedPassword = await hashPassword(password);
+  const newUser = {
+    ...user,
+    password: hashedPassword
+  };
+  return User.create(newUser);
+};
+
+const getByLogin = async login => await User.findOne({ login });
 
 const getById = async id => {
   const user = await User.findById(id);
@@ -28,4 +45,11 @@ const deleteUser = async id => {
   }
 };
 
-module.exports = { getAll, create, getById, deleteUser, updateUser };
+module.exports = {
+  getAll,
+  create,
+  getById,
+  deleteUser,
+  updateUser,
+  getByLogin
+};
